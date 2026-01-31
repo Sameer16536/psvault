@@ -1,12 +1,78 @@
-# Go Boilerplate
+# PSVault – Secure Password Vault Backend
 
-A production-ready monorepo template for building scalable web applications with Go backend and TypeScript frontend. Built with modern best practices, clean architecture, and comprehensive tooling.
+PSVault is a **zero-knowledge password vault backend** built with Go, designed to securely store, encrypt, and sync user credentials across devices—without the server ever seeing plaintext passwords.
+
+Inspired by systems like **Google Password Manager** and **Bitwarden**, PSVault follows modern security, cryptography, and clean architecture best practices.
+
+---
+
+## Core Principles
+
+* 🔐 **Zero-Knowledge Architecture**
+  The server never knows your master password or decrypted credentials.
+
+* 🧠 **Client-Side Encryption**
+  All sensitive data is encrypted before reaching the backend.
+
+* 🔑 **Key Derivation, Not Storage**
+  Encryption keys are derived from user secrets, never stored.
+
+* 📦 **Encrypted-at-Rest Storage**
+  The database only stores encrypted blobs and metadata.
+
+* 🔄 **Secure Sync, Not Password Handling**
+  Backend handles sync, auth, access control — not plaintext secrets.
+
+---
+
+## What This Backend Does (and Does NOT)
+
+### ✅ It DOES
+
+* Authenticate users securely
+* Store encrypted credential vaults
+* Version & sync vault data
+* Enforce access control
+* Handle metadata safely
+* Support secure recovery flows
+
+### ❌ It DOES NOT
+
+* See user passwords
+* Store master passwords
+* Decrypt credentials
+* Perform encryption of secrets
+
+---
+
+## High-Level Architecture
+
+```
+Client (Browser / App)
+│
+├─ Master Password (never sent)
+├─ Key Derivation (Argon2)
+├─ Encrypt Vault (AES-GCM)
+│
+▼
+Backend API (PSVault)
+│
+├─ Auth & Sessions
+├─ Encrypted Vault Storage
+├─ Metadata Indexing
+├─ Versioning & Sync
+│
+▼
+PostgreSQL (Encrypted Data Only)
+```
+
+---
 
 ## Features
 
 - **Monorepo Structure**: Organized with Turborepo for efficient builds and development
 - **Go Backend**: High-performance REST API with Echo framework
-- **Authentication**: Integrated Clerk SDK for secure user management
+- **Zero-Knowledge Authentication**: Integrated Clerk SDK for secure user management
 - **Database**: PostgreSQL with migrations and connection pooling
 - **Background Jobs**: Redis-based async job processing with Asynq
 - **Observability**: New Relic APM integration and structured logging
@@ -15,16 +81,100 @@ A production-ready monorepo template for building scalable web applications with
 - **API Documentation**: OpenAPI/Swagger specification
 - **Security**: Rate limiting, CORS, secure headers, and JWT validation
 
-## Project Structure
+---
+
+## Monorepo Structure
 
 ```
 psvault/
-├── apps/backend/          # Go backend application
-├── packages/         # Frontend packages (React, Vue, etc.)
-├── package.json      # Monorepo configuration
-├── turbo.json        # Turborepo configuration
-└── README.md         # This file
+├── apps/
+│   └── backend/          # Go backend (vault API)
+├── packages/
+│   └── frontend/         # Client apps (Web / Mobile)
+├── turbo.json
+├── package.json
+└── README.md
 ```
+
+---
+
+## Backend Responsibilities
+
+### Authentication
+
+* Uses external identity provider (e.g., Clerk)
+* Backend trusts auth provider, not passwords
+* User ID is the only identity reference
+
+### Vault Storage
+
+Each vault entry contains:
+
+* Encrypted secret blob
+* Encrypted title/username
+* Metadata (timestamps, type, version)
+
+### Encryption Model
+
+* Master password → Key derivation (client)
+* Derived key → Encrypt credentials (client)
+* Backend stores only ciphertext
+
+### Sync & Versioning
+
+* Each update increments vault version
+* Supports multi-device sync
+* Conflict resolution via timestamps
+
+---
+
+## Database Design (Simplified)
+
+### users
+
+* `id`
+* `auth_provider_id`
+* `created_at`
+
+### vault_items
+
+* `id`
+* `user_id`
+* `encrypted_blob`
+* `item_type`
+* `version`
+* `updated_at`
+
+### devices
+
+* `id`
+* `user_id`
+* `last_sync_at`
+
+---
+
+## API Responsibilities
+
+* `POST /vault/items` → Store encrypted vault item
+* `GET /vault/items` → Fetch encrypted vault
+* `PUT /vault/items/:id` → Update encrypted item
+* `POST /sync` → Device sync handshake
+* `POST /recovery/init` → Recovery metadata only
+
+> ⚠️ No endpoint ever accepts plaintext passwords.
+
+---
+
+## Security Features
+
+* Argon2-based key derivation (client)
+* AES-256-GCM encryption (client)
+* Rate limiting
+* Secure headers & CORS
+* Encrypted backups
+* Audit logging (no secrets)
+
+---
 
 ## Quick Start
 
@@ -59,7 +209,10 @@ cp apps/backend/.env.example apps/backend/.env
 # Edit apps/backend/.env with your configuration
 ```
 
-4. Start the database and Redis.
+4. Start the database and Redis:
+```bash
+docker compose up -d
+```
 
 5. Run database migrations:
 ```bash
@@ -78,6 +231,8 @@ task run
 ```
 
 The API will be available at `http://localhost:8080`
+
+---
 
 ## Development
 
@@ -100,26 +255,31 @@ bun lint               # Lint all packages
 
 ### Environment Variables
 
-The backend uses environment variables prefixed with `PSVAULT_`. Key variables include:
+All backend variables are prefixed with `PSVAULT_`.
 
-- `PSVAULT_DATABASE_*` - PostgreSQL connection settings
-- `PSVAULT_SERVER_*` - Server configuration
-- `PSVAULT_AUTH_*` - Authentication settings
-- `PSVAULT_REDIS_*` - Redis connection
-- `PSVAULT_EMAIL_*` - Email service configuration
-- `PSVAULT_OBSERVABILITY_*` - Monitoring settings
+* `PSVAULT_DATABASE_*` - PostgreSQL connection settings
+* `PSVAULT_SERVER_*` - Server configuration
+* `PSVAULT_AUTH_*` - Authentication settings
+* `PSVAULT_REDIS_*` - Redis connection
+* `PSVAULT_EMAIL_*` - Email service configuration
+* `PSVAULT_SECURITY_*` - Security configuration
+* `PSVAULT_OBSERVABILITY_*` - Monitoring settings
 
 See `apps/backend/.env.example` for a complete list.
 
+---
+
 ## Architecture
 
-This boilerplate follows clean architecture principles:
+This application follows clean architecture principles:
 
 - **Handlers**: HTTP request/response handling
 - **Services**: Business logic implementation
 - **Repositories**: Data access layer
 - **Models**: Domain entities
 - **Infrastructure**: External services (database, cache, email)
+
+---
 
 ## Testing
 
@@ -135,15 +295,24 @@ go test -cover ./...
 go test -tags=integration ./...
 ```
 
-### Production Considerations
+---
 
-1. Use environment-specific configuration
-2. Enable production logging levels
-3. Configure proper database connection pooling
-4. Set up monitoring and alerting
-5. Use a reverse proxy (nginx, Caddy)
-6. Enable rate limiting and security headers
-7. Configure CORS for your domains
+## Production Considerations
+
+* Enforce HTTPS everywhere
+* Use HSM or KMS for server secrets
+* Enable database encryption
+* Rotate auth keys regularly
+* Add anomaly detection
+* Perform security audits
+* Use environment-specific configuration
+* Configure proper database connection pooling
+* Set up monitoring and alerting
+* Use a reverse proxy (nginx, Caddy)
+* Enable rate limiting and security headers
+* Configure CORS for your domains
+
+---
 
 ## Contributing
 
@@ -152,6 +321,8 @@ go test -tags=integration ./...
 3. Commit your changes (`git commit -m 'Add amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
+
+---
 
 ## License
 
