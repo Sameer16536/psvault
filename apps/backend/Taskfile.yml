@@ -12,9 +12,7 @@ tasks:
 
   confirm:
     desc: confirmation prompt
-    cmds:
-      - |
-        echo -n 'Are you sure? [y/N] ' && read ans && [ ${ans:-N} = y ]
+    prompt: Are you sure you want to continue?
     silent: true
     internal: true
 
