@@ -56,5 +56,35 @@ func NewRouter(s *server.Server, h *handler.Handlers, services *service.Services
 	// register versioned routes
 	router.Group("/api/v1")
 
+	// TODO: Uncomment these routes once the handlers are created
+	// api := router.Group("/api")
+	//
+	// // Vault routes
+	// vaults := api.Group("/vaults")
+	// vaults.Use(middlewares.Auth.RequireAuth)
+	// vaults.POST("", h.Vault.Create)
+	// vaults.GET("", h.Vault.List)
+	// vaults.GET("/:id", h.Vault.GetByID)
+	// vaults.PUT("/:id", h.Vault.Update)
+	// vaults.DELETE("/:id", h.Vault.Delete)
+	// // Vault-specific secrets
+	// vaults.GET("/:vaultId/secrets", h.Secret.List)
+	//
+	// // Secret routes
+	// secrets := api.Group("/secrets")
+	// secrets.Use(middlewares.Auth.RequireAuth)
+	// secrets.POST("", h.Secret.Create)
+	// secrets.GET("/search", h.Secret.Search)
+	// secrets.GET("/:id", h.Secret.GetByID)
+	// secrets.PUT("/:id", h.Secret.Update)
+	// secrets.DELETE("/:id", h.Secret.Delete)
+	//
+	// // Device routes
+	// devices := api.Group("/devices")
+	// devices.Use(middlewares.Auth.RequireAuth)
+	// devices.POST("", h.Device.Register)
+	// devices.GET("", h.Device.List)
+	// devices.DELETE("/:id", h.Device.Delete)
+
 	return router
 }
