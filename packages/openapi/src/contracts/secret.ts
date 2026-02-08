@@ -1,4 +1,4 @@
-import { initContract } from "@ts-rest/core";
+import { initContract, type AppRouter } from "@ts-rest/core";
 import {
     ZCreateSecretRequest,
     ZUpdateSecretRequest,
@@ -9,7 +9,7 @@ import { getSecurityMetadata } from "@/utils.js";
 
 const c = initContract();
 
-export const secretContract = c.router(
+export const secretContract: AppRouter = c.router(
     {
         createSecret: {
             summary: "Create Secret",

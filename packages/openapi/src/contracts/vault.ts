@@ -1,4 +1,4 @@
-import { initContract } from "@ts-rest/core";
+import { initContract, type AppRouter } from "@ts-rest/core";
 import {
     ZCreateVaultRequest,
     ZUpdateVaultRequest,
@@ -8,7 +8,7 @@ import { getSecurityMetadata } from "@/utils.js";
 
 const c = initContract();
 
-export const vaultContract = c.router(
+export const vaultContract: AppRouter = c.router(
     {
         createVault: {
             summary: "Create Vault",

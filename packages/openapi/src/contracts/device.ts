@@ -1,4 +1,4 @@
-import { initContract } from "@ts-rest/core";
+import { initContract, type AppRouter } from "@ts-rest/core";
 import {
     ZRegisterDeviceRequest,
     ZDeviceResponse,
@@ -7,7 +7,7 @@ import { getSecurityMetadata } from "@/utils.js";
 
 const c = initContract();
 
-export const deviceContract = c.router(
+export const deviceContract: AppRouter = c.router(
     {
         registerDevice: {
             summary: "Register Device",
