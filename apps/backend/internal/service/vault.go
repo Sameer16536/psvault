@@ -24,9 +24,11 @@ func NewVaultService(s *server.Server, repos *repository.Repositories) *VaultSer
 // Create - Create a new vault
 func (s *VaultService) Create(ctx context.Context, userID string, req *vault.CreateVaultRequest) (*vault.VaultResponse, error) {
 	v := &vault.Vault{
-		UserID:      userID,
-		Name:        *req.Name,
-		Description: req.Description,
+		UserID:               userID,
+		Name:                 *req.Name,
+		Description:          req.Description,
+		EncryptedKey:         req.EncryptedKey,
+		KeyEncryptionVersion: req.KeyEncryptionVersion,
 	}
 	if err := s.repos.Vault.Create(ctx, v); err != nil {
 		return nil, fmt.Errorf("failed to create vault: %w", err)

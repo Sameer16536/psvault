@@ -8,6 +8,8 @@ interface Vault {
     userId: string;
     name: string;
     description?: string;
+    encryptedKey?: string;
+    keyEncryptionVersion?: number;
     createdAt: string;
     updatedAt: string;
 }
@@ -15,6 +17,8 @@ interface Vault {
 interface CreateVaultRequest {
     name: string;
     description?: string;
+    encryptedKey?: string;
+    keyEncryptionVersion?: number;
 }
 
 export const useVaults = () => {

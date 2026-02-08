@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserButton } from '@clerk/clerk-react';
 import { useVaults, useCreateVault, useDeleteVault } from '@/api/hooks/useVaults';
+import { useVaultStore } from '@/stores/vaultStore';
+import { generateVaultKey, encryptVaultKey } from '@/lib/crypto';
 import { Plus, Lock, Trash2, Sparkles, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -9,6 +11,8 @@ interface Vault {
     id: string;
     name: string;
     description?: string;
+    encryptedKey?: string;
+    keyEncryptionVersion?: number;
     createdAt: string;
     updatedAt: string;
 }
@@ -22,7 +26,8 @@ export default function DashboardPage() {
     const [showCreateDialog, setShowCreateDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [vaultToDelete, setVaultToDelete] = useState<Vault | null>(null);
-    const [newVault, setNewVault] = useState({ name: '', description: '' });
+    const [newVault, setNewVault] = useState({ name: '', description: '', masterPassword: '', confirmPassword: '' });
+    const { unlockVault } = useVaultStore();
 
     const handleCreateVault = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -31,17 +36,52 @@ export default function DashboardPage() {
             return;
         }
 
-        const payload: any = {
-            name: newVault.name.trim(),
-        };
-
-        if (newVault.description?.trim()) {
-            payload.description = newVault.description.trim();
+        if (!newVault.masterPassword) {
+            toast.error('Master password is required');
+            return;
         }
 
-        await createVault.mutateAsync(payload);
-        setNewVault({ name: '', description: '' });
-        setShowCreateDialog(false);
+        if (newVault.masterPassword !== newVault.confirmPassword) {
+            toast.error('Passwords do not match');
+            return;
+        }
+
+        if (newVault.masterPassword.length < 8) {
+            toast.error('Master password must be at least 8 characters');
+            return;
+        }
+
+        try {
+            // Generate random vault key
+            const vaultKey = await generateVaultKey();
+
+            // Encrypt vault key with master password
+            const encryptedKey = await encryptVaultKey(vaultKey, newVault.masterPassword);
+
+            const payload: any = {
+                name: newVault.name.trim(),
+                encryptedKey: encryptedKey,
+                keyEncryptionVersion: 1,
+            };
+
+            if (newVault.description?.trim()) {
+                payload.description = newVault.description.trim();
+            }
+
+            const createdVault = await createVault.mutateAsync(payload);
+
+            // Auto-unlock the vault
+            if (createdVault?.id) {
+                unlockVault(createdVault.id, vaultKey);
+            }
+
+            setNewVault({ name: '', description: '', masterPassword: '', confirmPassword: '' });
+            setShowCreateDialog(false);
+            toast.success('Vault created and unlocked!');
+        } catch (error) {
+            console.error('Failed to create vault:', error);
+            toast.error('Failed to create vault');
+        }
     };
 
     const handleDeleteClick = (vault: Vault, e: React.MouseEvent) => {
@@ -219,12 +259,41 @@ export default function DashboardPage() {
                                 />
                             </div>
 
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-300 mb-2">
+                                    Master Password *
+                                </label>
+                                <input
+                                    type="password"
+                                    value={newVault.masterPassword}
+                                    onChange={(e) => setNewVault({ ...newVault, masterPassword: e.target.value })}
+                                    className="w-full px-4 py-3 border border-white/10 rounded-xl bg-gray-800/50 text-white placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                                    placeholder="Enter master password (min 8 characters)"
+                                />
+                                <p className="text-xs text-gray-400 mt-1">
+                                    This password will be used to encrypt all secrets in this vault
+                                </p>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-300 mb-2">
+                                    Confirm Master Password *
+                                </label>
+                                <input
+                                    type="password"
+                                    value={newVault.confirmPassword}
+                                    onChange={(e) => setNewVault({ ...newVault, confirmPassword: e.target.value })}
+                                    className="w-full px-4 py-3 border border-white/10 rounded-xl bg-gray-800/50 text-white placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                                    placeholder="Confirm master password"
+                                />
+                            </div>
+
                             <div className="flex gap-3 pt-4">
                                 <button
                                     type="button"
                                     onClick={() => {
                                         setShowCreateDialog(false);
-                                        setNewVault({ name: '', description: '' });
+                                        setNewVault({ name: '', description: '', masterPassword: '', confirmPassword: '' });
                                     }}
                                     className="flex-1 px-6 py-3 border border-white/10 text-gray-300 rounded-xl hover:bg-gray-800/50 transition-all font-medium"
                                 >

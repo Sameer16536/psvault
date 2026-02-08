@@ -18,11 +18,11 @@ func NewVaultRepository(s *server.Server) *VaultRepository {
 // Create - Create a new vault
 func (r *VaultRepository) Create(ctx context.Context, v *vault.Vault) error {
 	query := `
-		INSERT INTO vaults (user_id, name, description)
-		VALUES ($1, $2, $3)
+		INSERT INTO vaults (user_id, name, description, encrypted_key, key_encryption_version)
+		VALUES ($1, $2, $3, $4, $5)
 		RETURNING id, created_at, updated_at
 	`
-	return r.server.DB.Pool.QueryRow(ctx, query, v.UserID, v.Name, v.Description).
+	return r.server.DB.Pool.QueryRow(ctx, query, v.UserID, v.Name, v.Description, v.EncryptedKey, v.KeyEncryptionVersion).
 		Scan(&v.ID, &v.CreatedAt, &v.UpdatedAt)
 }
 
@@ -30,12 +30,12 @@ func (r *VaultRepository) Create(ctx context.Context, v *vault.Vault) error {
 func (r *VaultRepository) GetByID(ctx context.Context, id string) (*vault.Vault, error) {
 	var v vault.Vault
 	query := `
-		SELECT id, user_id, name, description, created_at, updated_at
+		SELECT id, user_id, name, description, encrypted_key, key_encryption_version, created_at, updated_at
 		FROM vaults
 		WHERE id = $1
 	`
 	err := r.server.DB.Pool.QueryRow(ctx, query, id).Scan(
-		&v.ID, &v.UserID, &v.Name, &v.Description, &v.CreatedAt, &v.UpdatedAt,
+		&v.ID, &v.UserID, &v.Name, &v.Description, &v.EncryptedKey, &v.KeyEncryptionVersion, &v.CreatedAt, &v.UpdatedAt,
 	)
 	if err != nil {
 		// pgx returns pgx.ErrNoRows instead of sql.ErrNoRows
@@ -50,7 +50,7 @@ func (r *VaultRepository) GetByID(ctx context.Context, id string) (*vault.Vault,
 // ListByUserID - List all vaults for a user
 func (r *VaultRepository) ListByUserID(ctx context.Context, userID string) ([]*vault.Vault, error) {
 	query := `
-		SELECT id, user_id, name, description, created_at, updated_at
+		SELECT id, user_id, name, description, encrypted_key, key_encryption_version, created_at, updated_at
 		FROM vaults
 		WHERE user_id = $1
 		ORDER BY created_at DESC
@@ -64,7 +64,7 @@ func (r *VaultRepository) ListByUserID(ctx context.Context, userID string) ([]*v
 	var vaults []*vault.Vault
 	for rows.Next() {
 		var v vault.Vault
-		if err := rows.Scan(&v.ID, &v.UserID, &v.Name, &v.Description, &v.CreatedAt, &v.UpdatedAt); err != nil {
+		if err := rows.Scan(&v.ID, &v.UserID, &v.Name, &v.Description, &v.EncryptedKey, &v.KeyEncryptionVersion, &v.CreatedAt, &v.UpdatedAt); err != nil {
 			return nil, err
 		}
 		vaults = append(vaults, &v)
