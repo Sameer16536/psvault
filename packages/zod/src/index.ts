@@ -5,3 +5,6 @@ extendZodWithOpenApi(z);
 
 export * from "./utils.js";
 export * from "./health.js";
+export * from "./vault.js";
+export * from "./secret.js";
+export * from "./device.js";

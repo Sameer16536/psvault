@@ -1,5 +1,5 @@
 {
-  "openapi": "3.0.2",
+  "openapi": "3.0.3",
   "paths": {
     "/status": {
       "get": {
@@ -89,30 +89,1232 @@
           }
         }
       }
+    },
+    "/api/vaults": {
+      "post": {
+        "description": "Create a new password vault",
+        "summary": "Create Vault",
+        "tags": [
+          "Vault"
+        ],
+        "parameters": [],
+        "operationId": "createVault",
+        "requestBody": {
+          "description": "Body",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "description": {
+                    "type": "string",
+                    "maxLength": 500
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "201",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "userId": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "userId",
+                    "name",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "clerkAuth": []
+          }
+        ]
+      },
+      "get": {
+        "description": "Get all vaults for the authenticated user",
+        "summary": "List Vaults",
+        "tags": [
+          "Vault"
+        ],
+        "parameters": [],
+        "operationId": "listVaults",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "userId": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "userId",
+                      "name",
+                      "createdAt",
+                      "updatedAt"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "clerkAuth": []
+          }
+        ]
+      }
+    },
+    "/api/vaults/{id}": {
+      "get": {
+        "description": "Get a specific vault by ID",
+        "summary": "Get Vault",
+        "tags": [
+          "Vault"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "operationId": "getVault",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "userId": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "userId",
+                    "name",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "clerkAuth": []
+          }
+        ]
+      },
+      "put": {
+        "description": "Update vault details",
+        "summary": "Update Vault",
+        "tags": [
+          "Vault"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "operationId": "updateVault",
+        "requestBody": {
+          "description": "Body",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "description": {
+                    "type": "string",
+                    "maxLength": 500
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "userId": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "userId",
+                    "name",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "clerkAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "description": "Delete a vault and all its secrets",
+        "summary": "Delete Vault",
+        "tags": [
+          "Vault"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "operationId": "deleteVault",
+        "responses": {
+          "204": {
+            "description": "204"
+          }
+        },
+        "security": [
+          {
+            "clerkAuth": []
+          }
+        ]
+      }
+    },
+    "/api/secrets": {
+      "post": {
+        "description": "Create a new encrypted secret",
+        "summary": "Create Secret",
+        "tags": [
+          "Secret"
+        ],
+        "parameters": [],
+        "operationId": "createSecret",
+        "requestBody": {
+          "description": "Body",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "vaultId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "password",
+                      "note",
+                      "api_key",
+                      "card"
+                    ]
+                  },
+                  "encryptedPayload": {
+                    "type": "string"
+                  },
+                  "encryptionVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "metadata": {
+                    "type": "object",
+                    "properties": {
+                      "title": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 200
+                      },
+                      "domain": {
+                        "type": "string",
+                        "maxLength": 255
+                      },
+                      "tags": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "required": [
+                      "title"
+                    ]
+                  }
+                },
+                "required": [
+                  "vaultId",
+                  "type",
+                  "encryptedPayload",
+                  "encryptionVersion",
+                  "metadata"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "201",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "vaultId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "password",
+                        "note",
+                        "api_key",
+                        "card"
+                      ]
+                    },
+                    "encryptedPayload": {
+                      "type": "string"
+                    },
+                    "encryptionVersion": {
+                      "type": "integer"
+                    },
+                    "metadata": {
+                      "type": "object",
+                      "properties": {
+                        "title": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 200
+                        },
+                        "domain": {
+                          "type": "string",
+                          "maxLength": 255
+                        },
+                        "tags": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "required": [
+                        "title"
+                      ]
+                    },
+                    "lastAccessedAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "nullable": true
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "vaultId",
+                    "type",
+                    "encryptedPayload",
+                    "encryptionVersion",
+                    "metadata",
+                    "lastAccessedAt",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "clerkAuth": []
+          }
+        ]
+      }
+    },
+    "/api/secrets/search": {
+      "get": {
+        "description": "Search secrets with filters",
+        "summary": "Search Secrets",
+        "tags": [
+          "Secret"
+        ],
+        "parameters": [
+          {
+            "name": "vaultId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "password",
+                "note",
+                "api_key",
+                "card"
+              ]
+            }
+          },
+          {
+            "name": "title",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "domain",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tags",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "operationId": "searchSecrets",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "vaultId": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "password",
+                          "note",
+                          "api_key",
+                          "card"
+                        ]
+                      },
+                      "encryptedPayload": {
+                        "type": "string"
+                      },
+                      "encryptionVersion": {
+                        "type": "integer"
+                      },
+                      "metadata": {
+                        "type": "object",
+                        "properties": {
+                          "title": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 200
+                          },
+                          "domain": {
+                            "type": "string",
+                            "maxLength": 255
+                          },
+                          "tags": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        "required": [
+                          "title"
+                        ]
+                      },
+                      "lastAccessedAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "vaultId",
+                      "type",
+                      "encryptedPayload",
+                      "encryptionVersion",
+                      "metadata",
+                      "lastAccessedAt",
+                      "createdAt",
+                      "updatedAt"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "clerkAuth": []
+          }
+        ]
+      }
+    },
+    "/api/secrets/{id}": {
+      "get": {
+        "description": "Get a specific secret by ID (updates lastAccessedAt)",
+        "summary": "Get Secret",
+        "tags": [
+          "Secret"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "operationId": "getSecret",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "vaultId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "password",
+                        "note",
+                        "api_key",
+                        "card"
+                      ]
+                    },
+                    "encryptedPayload": {
+                      "type": "string"
+                    },
+                    "encryptionVersion": {
+                      "type": "integer"
+                    },
+                    "metadata": {
+                      "type": "object",
+                      "properties": {
+                        "title": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 200
+                        },
+                        "domain": {
+                          "type": "string",
+                          "maxLength": 255
+                        },
+                        "tags": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "required": [
+                        "title"
+                      ]
+                    },
+                    "lastAccessedAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "nullable": true
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "vaultId",
+                    "type",
+                    "encryptedPayload",
+                    "encryptionVersion",
+                    "metadata",
+                    "lastAccessedAt",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "clerkAuth": []
+          }
+        ]
+      },
+      "put": {
+        "description": "Update secret data and/or metadata",
+        "summary": "Update Secret",
+        "tags": [
+          "Secret"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "operationId": "updateSecret",
+        "requestBody": {
+          "description": "Body",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "encryptedPayload": {
+                    "type": "string"
+                  },
+                  "encryptionVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "metadata": {
+                    "type": "object",
+                    "properties": {
+                      "title": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 200
+                      },
+                      "domain": {
+                        "type": "string",
+                        "maxLength": 255
+                      },
+                      "tags": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "required": [
+                      "title"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "vaultId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "password",
+                        "note",
+                        "api_key",
+                        "card"
+                      ]
+                    },
+                    "encryptedPayload": {
+                      "type": "string"
+                    },
+                    "encryptionVersion": {
+                      "type": "integer"
+                    },
+                    "metadata": {
+                      "type": "object",
+                      "properties": {
+                        "title": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 200
+                        },
+                        "domain": {
+                          "type": "string",
+                          "maxLength": 255
+                        },
+                        "tags": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "required": [
+                        "title"
+                      ]
+                    },
+                    "lastAccessedAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "nullable": true
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "vaultId",
+                    "type",
+                    "encryptedPayload",
+                    "encryptionVersion",
+                    "metadata",
+                    "lastAccessedAt",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "clerkAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "description": "Delete a secret permanently",
+        "summary": "Delete Secret",
+        "tags": [
+          "Secret"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "operationId": "deleteSecret",
+        "responses": {
+          "204": {
+            "description": "204"
+          }
+        },
+        "security": [
+          {
+            "clerkAuth": []
+          }
+        ]
+      }
+    },
+    "/api/vaults/{vaultId}/secrets": {
+      "get": {
+        "description": "Get all secrets in a specific vault",
+        "summary": "List Vault Secrets",
+        "tags": [
+          "Secret"
+        ],
+        "parameters": [
+          {
+            "name": "vaultId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "operationId": "listVaultSecrets",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "vaultId": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "password",
+                          "note",
+                          "api_key",
+                          "card"
+                        ]
+                      },
+                      "encryptedPayload": {
+                        "type": "string"
+                      },
+                      "encryptionVersion": {
+                        "type": "integer"
+                      },
+                      "metadata": {
+                        "type": "object",
+                        "properties": {
+                          "title": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 200
+                          },
+                          "domain": {
+                            "type": "string",
+                            "maxLength": 255
+                          },
+                          "tags": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        "required": [
+                          "title"
+                        ]
+                      },
+                      "lastAccessedAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "vaultId",
+                      "type",
+                      "encryptedPayload",
+                      "encryptionVersion",
+                      "metadata",
+                      "lastAccessedAt",
+                      "createdAt",
+                      "updatedAt"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "clerkAuth": []
+          }
+        ]
+      }
+    },
+    "/api/devices": {
+      "post": {
+        "description": "Register a new device or update last seen time",
+        "summary": "Register Device",
+        "tags": [
+          "Device"
+        ],
+        "parameters": [],
+        "operationId": "registerDevice",
+        "requestBody": {
+          "description": "Body",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "deviceFingerprint": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255
+                  }
+                },
+                "required": [
+                  "deviceFingerprint"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "201",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "userId": {
+                      "type": "string"
+                    },
+                    "deviceFingerprint": {
+                      "type": "string"
+                    },
+                    "lastSeenAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "userId",
+                    "deviceFingerprint",
+                    "lastSeenAt",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "clerkAuth": []
+          }
+        ]
+      },
+      "get": {
+        "description": "Get all registered devices for the user",
+        "summary": "List Devices",
+        "tags": [
+          "Device"
+        ],
+        "parameters": [],
+        "operationId": "listDevices",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "userId": {
+                        "type": "string"
+                      },
+                      "deviceFingerprint": {
+                        "type": "string"
+                      },
+                      "lastSeenAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "userId",
+                      "deviceFingerprint",
+                      "lastSeenAt",
+                      "createdAt",
+                      "updatedAt"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "clerkAuth": []
+          }
+        ]
+      }
+    },
+    "/api/devices/{id}": {
+      "delete": {
+        "description": "Remove a registered device",
+        "summary": "Delete Device",
+        "tags": [
+          "Device"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "operationId": "deleteDevice",
+        "responses": {
+          "204": {
+            "description": "204"
+          }
+        },
+        "security": [
+          {
+            "clerkAuth": []
+          }
+        ]
+      }
     }
   },
   "info": {
     "version": "1.0.0",
-    "title": "Boilerplate REST API - Documentation",
-    "description": "Boilerplate REST API - Documentation"
+    "title": "PSVault API - Password Vault Backend",
+    "description": "Secure password vault backend with encrypted storage, Clerk authentication, and comprehensive audit logging."
   },
   "servers": [
     {
       "url": "http://localhost:8080",
-      "description": "Local Server"
+      "description": "Local Development Server"
+    },
+    {
+      "url": "https://api.psvault.com",
+      "description": "Production Server"
     }
   ],
   "components": {
     "securitySchemes": {
-      "bearerAuth": {
+      "clerkAuth": {
         "type": "http",
         "scheme": "bearer",
-        "bearerFormat": "JWT"
-      },
-      "x-service-token": {
-        "type": "apiKey",
-        "name": "x-service-token",
-        "in": "header"
+        "bearerFormat": "JWT",
+        "description": "Clerk session token obtained from Clerk authentication"
       }
     }
   }

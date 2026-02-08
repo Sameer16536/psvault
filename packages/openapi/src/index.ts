@@ -26,8 +26,8 @@ const operationMapper: OperationMapper = (operation, appRoute) => ({
   ...operation,
   ...(hasSecurity(appRoute.metadata)
     ? {
-        security: appRoute.metadata.openApiSecurity,
-      }
+      security: appRoute.metadata.openApiSecurity,
+    }
     : {}),
 });
 
@@ -35,16 +35,20 @@ export const OpenAPI = Object.assign(
   generateOpenApi(
     apiContract,
     {
-      openapi: "3.0.2",
+      openapi: "3.0.3",
       info: {
         version: "1.0.0",
-        title: "Boilerplate REST API - Documentation",
-        description: "Boilerplate REST API - Documentation",
+        title: "PSVault API - Password Vault Backend",
+        description: "Secure password vault backend with encrypted storage, Clerk authentication, and comprehensive audit logging.",
       },
       servers: [
         {
           url: "http://localhost:8080",
-          description: "Local Server",
+          description: "Local Development Server",
+        },
+        {
+          url: "https://api.psvault.com",
+          description: "Production Server",
         },
       ],
     },
@@ -56,15 +60,11 @@ export const OpenAPI = Object.assign(
   {
     components: {
       securitySchemes: {
-        bearerAuth: {
+        clerkAuth: {
           type: "http",
           scheme: "bearer",
           bearerFormat: "JWT",
-        },
-        "x-service-token": {
-          type: "apiKey",
-          name: "x-service-token",
-          in: "header",
+          description: "Clerk session token obtained from Clerk authentication",
         },
       },
     },

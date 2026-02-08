@@ -2,15 +2,15 @@ import { match } from "ts-pattern";
 
 export const getSecurityMetadata = ({
   security = true,
-  securityType = "bearer",
+  securityType = "clerk",
 }: {
   security?: boolean;
-  securityType?: "bearer" | "service";
+  securityType?: "clerk" | "service";
 } = {}) => {
   const openApiSecurity = match(securityType)
-    .with("bearer", () => [
+    .with("clerk", () => [
       {
-        bearerAuth: [],
+        clerkAuth: [],
       },
     ])
     .with("service", () => [
