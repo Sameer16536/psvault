@@ -1,0 +1,88 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: psvault-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: psvault
+    volumes:
+      - psvault_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - psvault-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: psvault-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - psvault-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    container_name: psvault-backend
+    build:
+      context: ./apps/backend
+      dockerfile: Dockerfile
+    environment:
+      # Database
+      PSVAULT_DATABASE_HOST: db
+      PSVAULT_DATABASE_PORT: 5432
+      PSVAULT_DATABASE_USER: postgres
+      PSVAULT_DATABASE_PASSWORD: password
+      PSVAULT_DATABASE_NAME: psvault
+      PSVAULT_DATABASE_SSL_MODE: disable
+      PSVAULT_DB_DSN: postgres://postgres:password@db:5432/psvault?sslmode=disable
+      
+      # Redis
+      PSVAULT_REDIS_ADDRESS: redis:6379
+      
+      # Server
+      PSVAULT_SERVER_PORT: 8080
+      PSVAULT_SERVER_CORS_ALLOWED_ORIGINS: http://localhost:3000
+      
+      # App Secrets (Defaults, override in .env or shell)
+      PSVAULT_AUTH_SECRET_KEY: ${PSVAULT_AUTH_SECRET_KEY:-secret}
+      CLERK_SECRET_KEY: ${CLERK_SECRET_KEY}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    networks:
+      - psvault-net
+
+  frontend:
+    container_name: psvault-frontend
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile
+      args:
+        VITE_CLERK_PUBLISHABLE_KEY: ${VITE_CLERK_PUBLISHABLE_KEY}
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - psvault-net
+
+networks:
+  psvault-net:
+    driver: bridge
+
+volumes:
+  psvault_data:
